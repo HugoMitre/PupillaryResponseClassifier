@@ -1,4 +1,4 @@
-# Classifying the Difficulty Levels of Working Memory Tasks by using Pupillary Response
+# Classifying the Difficulty Levels of Working Memory Tasks by using Pupillary Response :page_with_curl:
 Authors: [Hugo Mitre-Hernandez](http://scholar.google.com/citations?user=TjQqDSIAAAAJ&hl=en), [Jorge Sanchez-Rodriguez](https://scholar.google.com/citations?user=1hWlnBoAAAAJ&hl=en), [Sergio Nava-Muñoz](https://scholar.google.com/citations?user=Fc9sxKgAAAAJ&hl=en&authuser=1&oi=ao), [Carlos Lara-Alvarez](https://scholar.google.com.mx/citations?user=LwK9CQ8AAAAJ&hl=es)
 
 Institution: [Center for Research in Mathematics (CIMAT)](http://www.cimat.mx/en), Zacatecas, Zacatecas, Mexico.
