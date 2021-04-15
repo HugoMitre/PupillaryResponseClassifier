@@ -16,6 +16,7 @@ Memorization is a key cognitive process in the learning content. A course with d
 
 ## Cite this work
 In case you are using this code, please cite this work as follows:
+
 Hugo Mitre-Hernandez, Jorge Sanchez-Rodriguez, Sergio Nava-Muñoz, Carlos Lara-Alvarez (2021). Classifying the Difficulty Levels of Working Memory Tasks by using Pupillary Response. Preprint: PeerJ Computer Science.
 
 ## Dataset
