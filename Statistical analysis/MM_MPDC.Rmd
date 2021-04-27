@@ -1,0 +1,219 @@
+---
+title: "Mixed Model MPDC"
+output:
+  html_document: default
+  word_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,fig.width = 10, fig.height = 10)
+```
+
+
+```{r warning=FALSE,echo=FALSE,message=FALSE}
+library(tidyverse)
+library(knitr)
+library(patchwork)
+theme_set(
+  theme_classic() +
+    theme(legend.position = "top")
+)
+
+options("scipen"=100, "digits"=4)
+
+# Data preparation
+
+substrRight <- function(x, n){
+  substr(x, nchar(x)-n+1, nchar(x))
+}
+library(readxl)
+Datos <- read_csv("VariablesVisualActualizado.csv")
+Datos <- Datos %>% 
+  mutate(SequenceMemory = substrRight(Name,3)) %>%
+  mutate(SMN = as.numeric(substrRight(Name,2))) %>%
+  arrange(Subject,SequenceMemory) %>%
+  group_by(Subject) %>%
+  mutate(id = 1:n())  %>%
+  mutate(id=factor(id,levels=1:20))
+
+Datos$Level<- factor(Datos$Nivel, labels  =c("low","medium","high"))
+
+
+
+opts <- options(knitr.kable.NA = "")
+```
+
+## Data
+
+```{r }
+Datos %>% 
+  ungroup() %>% 
+  dplyr::select(Subject,Level,MPDC) %>% 
+  group_by(Subject,Level) %>%
+  mutate(mid = 1:n()) %>%
+  pivot_wider(names_from=mid,values_from=MPDC) %>% 
+  arrange(Subject,Level) %>%
+  kable()
+```
+
+
+## Summary by group
+
+```{r}
+Datos %>%
+  group_by(Level) %>% 
+  summarise(n=n(),MD=mean(MPDC),SD=sd(MPDC)) %>%
+  kable()
+
+(q <-Datos %>% ggplot(aes(x=Level,y=MPDC)) + 
+    geom_point() + facet_wrap(~ Subject)+
+    labs(x="Difficulty level")+theme_bw()+
+    stat_summary(fun="mean", geom="point",color="red"))
+
+
+```
+
+
+
+## Random Intercept and Slope Model
+
+```{r warning=FALSE,echo=FALSE,message=FALSE}
+# Modelo Mixto
+
+require(multcomp) # para summary(glht(MPDC_mixed,linfct=mcp(Level="Tukey")))
+# los siguientes son necesarios para plot_model
+require(sjPlot)
+require(sjlabelled)
+require(sjmisc)
+require(ggplot2)
+```
+
+The following model is used to investigate whether there are significant differences between the study variables:
+\begin{equation}
+y_{ij} = \mu +  l_k + s_j +(sl)_{jk}+\epsilon_{ij} ,
+\end{equation}
+where $y_{ij}$ is the response variable (MPDC) for the i-th observation  from the j-th subject, $\mu$ is  the intercept, $l_k$ is the \mbox{$k$-th} difficulty  level, $s_j$ is the  jth subject effect, $(sl)_{jk}$ is the subject-level effect, i.e., the \mbox{$k$-th} level effect at the \mbox{j-th subject}, $\epsilon_{ij}$  is the \mbox{error term (residual) for the }i\mbox{th} observation from the jth subject.
+
+
+We called *level* $l$ a fixed effect, and $\epsilon$ is our *error term* that represent deviations from our predictions due to *random* factors that we cannot control experimentally. However, several measurements were taken for each subject at each difficulty level and that violates the assumption of independence of a linear model. On the other hand, each individual has a different cognitive load capacity, and this will be a characteristic factor that will affect all the responses of the same subject, which will make these responses interdependent instead of independent, see figure \ref{fig:MPDC}. The way we approaches this situation is adding a random effect to the subject and to the subject-level  interaction. This allows us to solve this lack of independence by assuming a different  intercept and slope for each subject. And finally,  we assume that the residual, subject and subject-level effects are all relations of separate distributions, all with zero means: 
+\begin{align*}
+\epsilon_{ij}&\sim N(0,\sigma^2), \\
+s_j&\sim N(0,\sigma_s^2), \\
+(sl)_{jk}&\sim N(0,\sigma_{sl}^2). 
+\end{align*}
+Hence, $s_j$  and $(sl)_{jk}$  are now random effects, and  $\mu$ and $l_k$ are fixed effects.
+
+
+Using the **R** notation the model is 
+
+
+$$MPDC = (b_0+u_{Subject}) + b_{Level} Level+\epsilon$$
+
+In order to evaluate if there is an effect due to the difficulty level we will use the likelihood ratio test of the model with the  *Level* effect against the model without the *Level* effect.
+
+```{r warning=FALSE, message=FALSE}
+MPDC_mixed_reducido <- lme4::lmer(MPDC ~ 1 + (1+Level|Subject),data=Datos,REML=F)
+
+MPDC_mixed_lme4 <- lme4::lmer(MPDC ~ Level + (1+Level|Subject),data=Datos,REML=F)
+
+anova(MPDC_mixed_reducido,MPDC_mixed_lme4)
+```
+
+The p-value  of the ratio test is significant at a level of 0.001.
+
+```{r warning=FALSE,message=FALSE}
+
+MPDC_mixed_lme4 <- lme4::lmer(MPDC ~ Level + (1+Level|Subject),data=Datos)
+summary(MPDC_mixed_lme4)
+
+p<-plot_model(MPDC_mixed_lme4, type = "diag")
+
+({p[[1]]+theme(plot.title=element_blank(),plot.subtitle=element_blank())+scale_x_continuous(name="Theoretical quantiles") +  p[[2]] + plot_layout(ncol=2,widths=c(1,2))} / {p[[3]]+theme(plot.title=element_blank(),plot.subtitle=element_blank()) +  p[[4]]+theme(plot.title=element_blank(),plot.subtitle=element_blank())})
+
+
+contr <- glht(MPDC_mixed_lme4,linfct=mcp(Level="Tukey"))
+summary(contr, test = adjusted("holm"))
+confint(contr)
+plot(confint(contr))
+contr.cld <- cld(contr)
+old.par <- par(mai=c(1,1,1.25,1), no.readonly = TRUE)
+plot(contr.cld)
+par(old.par)
+```
+
+
+```{r warning=FALSE,message=FALSE}
+Datos2 = Datos 
+Datos2$res = residuals(MPDC_mixed_lme4,type="pearson")
+Datos2$fit = fitted(MPDC_mixed_lme4,type="pearson")
+
+Datos2 %>% arrange(desc(res)) %>% head() %>% kable()
+Datos2 %>% arrange(desc(res)) %>% tail() %>% kable()
+shapiro.test(Datos2$res)
+goftest::ad.test(Datos2$res,null="pnorm",mean=mean(Datos2$res), sd=sd(Datos2$res), estimated=TRUE)
+rstatix::levene_test(data=ungroup(Datos2),res~Level)
+```
+
+
+## The same model without the outlier
+
+We repeat the analysis without the outlier
+
+```{r warning=FALSE,message=FALSE}
+
+
+# we exclude the outlier
+Datos <- Datos %>% filter(!(Subject=="s10"&SMN==24))
+
+```
+
+
+```{r warning=FALSE,message=FALSE}
+
+
+MPDC_mixed_lme4 <- lme4::lmer(MPDC ~ Level + (1+Level|Subject),data=Datos)
+summary(MPDC_mixed_lme4)
+anova(MPDC_mixed_lme4)
+coef(MPDC_mixed_lme4)
+
+
+p<-plot_model(MPDC_mixed_lme4, type = "diag")
+
+(q<-{p[[1]]+theme(plot.title=element_blank(),plot.subtitle=element_blank())+scale_x_continuous(name="Theoretical quantiles") +  p[[2]] + plot_layout(ncol=2,widths=c(1,2))} / {p[[3]]+theme(plot.title=element_blank(),plot.subtitle=element_blank()) +  p[[4]]+theme(plot.title=element_blank(),plot.subtitle=element_blank())})
+# muy importante Tukey para lme4.
+contr <- glht(MPDC_mixed_lme4,linfct=mcp(Level="Tukey"))
+summary(contr, test = adjusted("holm"))
+confint(contr)
+plot(confint(contr))
+contr.cld <- cld(contr)
+### use sufficiently large upper margin
+old.par <- par(mai=c(1,1,1.25,1), no.readonly = TRUE)
+### plot
+plot(contr.cld)
+par(old.par)
+```
+
+
+
+
+```{r warning=FALSE,message=FALSE}
+Datos2=Datos
+Datos2$res = residuals(MPDC_mixed_lme4,type="pearson")
+Datos2$fit = fitted(MPDC_mixed_lme4,type="pearson")
+shapiro.test(Datos2$res)
+goftest::ad.test(Datos2$res,null="pnorm",mean=mean(Datos2$res), sd=sd(Datos2$res), estimated=TRUE)
+rstatix::levene_test(data=ungroup(Datos2),res~Level)
+```
+
+
+
+## Non parametric tests
+ 
+```{r warning=FALSE,message=FALSE}
+kruskal.test(MPDC ~ Level, data=Datos)
+
+PMCMR::posthoc.kruskal.nemenyi.test(data=Datos,MPDC~Level, dist="Tukey")
+
+PMCMRplus::tukeyTest(data=Datos,MPDC~Level)
+```
