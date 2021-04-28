@@ -6,7 +6,7 @@ import itertools
 from sklearn.preprocessing import StandardScaler
 
 # Se carga archivo csv con las métricas calculadas para cada prueba.
-datos = pd.read_csv('D:/GoogleDriveCIMAT/CIMAT/Tesis/Memoria de trabajo/Analisis/analisis-tareas-de-memoria-de-trabajo/VariablesVisualActualizado.csv')
+datos = pd.read_csv('D:/VariablesVisual.csv')
 datos=datos[['nivel','blps','mpdc','apcps','pd1','entropy','TTP','PST']]
 datos=datos.astype(float)
 
@@ -31,9 +31,6 @@ count = 1
 for features in all_combinations:
     features = list(features)
     X=datos[features]
-    #print('Cantidad de pruebas por nivel:')
-    #print(datos['nivel'].value_counts())
-    #print(X.columns)
     
     # Se separan los datos para entrenamiento (80%) y evaluación (20%).
     X_train, X_test, y_train, y_test = train_test_split(X, y,
@@ -47,9 +44,8 @@ for features in all_combinations:
     X_test = pd.DataFrame(X_test_array, index=X_test.index, columns=X_test.columns)
     
     C = 1.0
-    models = svm.SVC(kernel='linear', C=C)
+    models = svm.LinearSVC(C=C, max_iter=100)
     
-    #print(models)
     models.fit(X_train,y_train)
     y_pred = models.predict(X_test)
     # reporte de estadísticas.
@@ -63,6 +59,5 @@ for features in all_combinations:
     subconjunto.append('/'.join(features))
     print(count)
     count += 1
-    #print("********************")
 reporte = pd.DataFrame({'subconjunto':subconjunto,'uno':uno,'tres':tres,'seis':seis,'macro':macro,'weighted':weighted})
-reporte.to_excel('linear2.xlsx')
+reporte.to_excel('LinearSVC.xlsx')

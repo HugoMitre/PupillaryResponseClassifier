@@ -147,7 +147,6 @@ def inform(subject, archivos):
     elif str(informacion.Stimulus_sequence[posicion])=='nan':
         nivel = 0
     else:
-        #3=5, 4=7, 5=9
         nivel = len(informacion.Stimulus_sequence[posicion])-((len(informacion.Stimulus_sequence[posicion])-1)/2)-2
 
     training = informacion.Training[posicion]
@@ -156,24 +155,23 @@ def inform(subject, archivos):
     return subject, name, training, nivel
 
 def archivo(subject, name, training, nivel, blps, mpdc, apcps, pd1, entropy, TTP, PDS):
-    if os.path.isfile('VariablesVisualActualizado.csv')==False:
-        #data = pd.DataFrame({'Subject':subject,'Name':name, 'Training':training, 'Nivel':nivel, 'BLPS':blps, 'MPDC':mpdc, 'APCPS':apcps, 'PD':pd1, 'Entropy':entropy, 'TTP':TTP, 'PDS':PDS, 'carlos':carlos})
+    if os.path.isfile('VariablesVisual.csv')==False:
         data = pd.DataFrame(columns=('subject', 'name', 'training', 'nivel', 'blps', 'mpdc', 'apcps', 'pd1', 'entropy', 'TTP','PDS'))
         data.loc[len(data)]=[subject, name, training, nivel, blps, mpdc, apcps, pd1, entropy, TTP, PDS]
-        data.to_csv('VariablesVisualActualizado.csv', index = None, header=True)
+        data.to_csv('VariablesVisual.csv', index = None, header=True)
     else:
-        data = pd.read_csv('VariablesVisualActualizado.csv')
+        data = pd.read_csv('VariablesVisual.csv')
         data.loc[len(data)]=[subject, name, training, nivel, blps, mpdc, apcps, pd1, entropy, TTP, PDS]
-        data.to_csv('VariablesVisualActualizado.csv', index = None, header=True)
+        data.to_csv('VariablesVisual.csv', index = None, header=True)
 
 participantes = 17
 epsilon = sys.float_info.epsilon
 
 for x in range(1,participantes+1):
     if x<=9:
-        origen = "D:/GoogleDriveCIMAT/CIMAT/Tesis/Memoria de trabajo/Datos/visual-data/s0"+str(x)
+        origen = "D:/visual-data/s0"+str(x)
     else:
-        origen = "D:/GoogleDriveCIMAT/CIMAT/Tesis/Memoria de trabajo/Datos/visual-data/s"+str(x)
+        origen = "D:/visual-data/s"+str(x)
 
     for carpetas in os.listdir(origen):
         if (carpetas[0]=='S' or carpetas[0]=='s'):      
@@ -186,7 +184,6 @@ for x in range(1,participantes+1):
                     [pupilsize, timestamp_microsec, porcent, numeroDeBlinks] = filtrarDatos(datos)
                     [subject, name, training, nivel] = inform(origen[-3:],archivos)
                     if(training == False and (nivel==1 or nivel==3 or nivel==6) and porcent>=70):
-                        #pupilsize = hampel(pupilsize,1)
                         pupilsize = savgol_filter(pupilsize, 13, 2)
                         [blps,i] = baseLine(pupilsize, timestamp_microsec)
                         mpdc = meanPupilDiameterChange(pupilsize,blps, i)
@@ -195,8 +192,5 @@ for x in range(1,participantes+1):
                         entropy = pupilEntropy(pupilsize,i)
                         TTP = timeToPeakPupilSize(pupilsize,i,pd1,timestamp_microsec,blps)
                         PDS = peakDilationSpeed(pupilsize,i,timestamp_microsec, pd1, blps)
-                        #carlos = pd1/(epsilon+TTP)                    
                         print(nivel)
                         archivo(subject, name, training, nivel, blps, mpdc, apcps, pd1, entropy, TTP, PDS) 
-                    #archivo(subject, name, training, stimulus_sequence, duration)
-                    #######Borrar todo lo que tenga que ver con fijaciones

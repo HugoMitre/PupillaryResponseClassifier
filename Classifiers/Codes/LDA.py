@@ -6,7 +6,7 @@ from sklearn.preprocessing import StandardScaler
 import itertools
 
 # Se carga archivo csv con las métricas calculadas para cada prueba.
-datos = pd.read_csv('D:/GoogleDriveCIMAT/CIMAT/Tesis/Memoria de trabajo/Analisis/analisis-tareas-de-memoria-de-trabajo/VariablesVisualActualizado.csv')
+datos = pd.read_csv('D:/VariablesVisual.csv')
 datos=datos[['nivel','blps','mpdc','apcps','pd1','entropy','TTP','PST']]
 datos=datos.astype(float)
 
@@ -31,9 +31,7 @@ count = 1
 for features in all_combinations:
     features = list(features)
     X=datos[features]
-    #print('Cantidad de pruebas por nivel:')
-    #print(datos['nivel'].value_counts())
-    #print(X.columns)
+
     
     # Se separan los datos para entrenamiento (80%) y evaluación (20%).
     X_train, X_test, y_train, y_test = train_test_split(X, y,
@@ -54,8 +52,6 @@ for features in all_combinations:
 
     # Matriz de confusión y reporte de estadísticas.
     y_pred = clf.predict(X_test)
-    #print(confusion_matrix(y_test,y_pred))
-    #print(classification_report(y_test,y_pred))
     reporte = classification_report(y_test,y_pred)
      
     uno.append(reporte[74:78])
@@ -66,6 +62,5 @@ for features in all_combinations:
     subconjunto.append('/'.join(features))
     print(count)
     count += 1
-    #print("********************")
 reporte = pd.DataFrame({'subconjunto':subconjunto,'uno':uno,'tres':tres,'seis':seis,'macro':macro,'weighted':weighted})
-reporte.to_excel('LDA2.xlsx')
+reporte.to_excel('LDA.xlsx')
