@@ -1,6 +1,4 @@
 import os
-from xml.dom import minidom
-from xml.dom.minidom import parse
 import pandas as pd
 import numpy as np
 from scipy.signal import savgol_filter
