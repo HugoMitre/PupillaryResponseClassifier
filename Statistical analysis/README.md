@@ -7,4 +7,4 @@ All folders contain three files:
 - **.pdf**: Illustrates the output of the .Rmd file in pdf format. 
 - **.html**: Illustrates the output of the .Rmd file in html format. 
 
-***To execute the .Rmd file correctly is necessary to have the file with the calculated variables.***
+***To execute the .Rmd file correctly is necessary to have the file with the calculated variables (VariablesVisual.csv).***
