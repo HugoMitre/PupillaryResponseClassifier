@@ -19,7 +19,7 @@ The BLPS is used to set a value of the pupil stabilization. It is calculated in 
 
 <img width="211" alt="Captura de Pantalla 2021-11-11 a la(s) 10 41 54" src="https://user-images.githubusercontent.com/29002113/141335568-6a2babae-2bea-4b5d-98cc-73d41ecbf360.png">
 
-
+where PSi is the pupillary data collected at time i, and BLPS is the baseline.
 
 
 
