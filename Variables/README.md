@@ -31,7 +31,15 @@ where _PSi_ is the pupil size collected in the _i–th_ time, and _BLPS_ is the 
 
 where _n_ is the number of measurements in the interval.
 
+**Peak Dilation (PD)**. The Peak Pupil Dilation (PPD) is defined as,
 
+<img width="212" alt="Captura de Pantalla 2021-11-11 a la(s) 10 49 41" src="https://user-images.githubusercontent.com/29002113/141336748-e5818576-7a03-42b4-9cf7-f6ff7ba52a10.png">
+
+To reduce the error caused by different sizes of the human eye, we modified the equation proposed in Marandi et al. (2018) by including the _BLPS_.
+
+<img width="143" alt="Captura de Pantalla 2021-11-11 a la(s) 10 50 43" src="https://user-images.githubusercontent.com/29002113/141336897-090f53b8-16ce-4547-9f1e-22b018f19509.png">
+
+**Entropy of Pupil (Epupil)**. Supose that the pupil dilation is a random variable _S_ with possible values _S1,S2,...,Sm_ such that _S1 = min{PS1,PS2,...,PSn}_, _Sm = PPD_. Consider that _Pi = f(i)_, where _f(i)_ is the relative frequency associated with the _i-th_ value _Si_ (i.e., how often the value si happens divided by the number of observations _n_). The information entropy is defined as
 
 
 
