@@ -17,7 +17,7 @@ Knowing the difficulty of a given task is crucial for improving the learning out
 ## Cite this work :link:
 In case you are using this code, please cite this work as follows:
 
-Hugo Mitre-Hernandez, Jorge Sanchez-Rodriguez, Sergio Nava-Muñoz, Carlos Lara-Alvarez (2021). Classifying the Difficulty Levels of Working Memory Tasks by using Pupillary Response. Preprint: PeerJ.
+Mitre-Hernandez H, Sanchez-Rodriguez J, Nava-Muñoz S, Lara-Alvarez C. 2022. Classifying the difficulty levels of working memory tasks by using pupillary response. PeerJ 10:e12864 https://doi.org/10.7717/peerj.12864
 
 ## Dataset :floppy_disk:
 The dataset of the pupillary response can be found at:
